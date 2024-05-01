@@ -14,6 +14,7 @@ namespace Practica_2.Controllers
         public PatientController() {
             _patientManager = new PatientManager();
         }
+
         [HttpGet]
         public List<Patient> Get() {
             return _patientManager.GetPatients();
@@ -24,14 +25,17 @@ namespace Practica_2.Controllers
         public Patient Get(int ci) { 
             return _patientManager.GetPatientByCI(ci);
         }
+
         [HttpPost]
         public void Post([FromBody] Patient value) {
-            _patientManager.CrearPatient(value.Name, value.LastName, value.CI);
+            _patientManager.CrearPatient(value);
         }
+        
         [HttpPut("{ci}")]
         public void Put(int ci, [FromBody] Patient value) {
             _patientManager.ActualizarPatient(ci, value);
         }
+        
         [HttpDelete("{ci}")]
         public void Delete(int ci)
         {

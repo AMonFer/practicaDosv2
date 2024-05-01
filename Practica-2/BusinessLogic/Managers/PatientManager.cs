@@ -15,41 +15,52 @@ namespace UPB.BusinessLogic.Managers
             leerPatient();
         }
 
-        public Patient CrearPatient(string name, string lastname, int CI) {
+        public Patient CrearPatient(Patient patient) {
             string sangre = randomBlood();
-
-            Patient patient = new Patient()
-            {
-                Name = name,
-                LastName = lastname,
-                CI = CI,
-                BloodType = sangre
-            };
-            _patients.Add(patient);
-            return patient;
+            Patient createdp;
+            createdp = new Patient(patient.Name, patient.LastName, patient.CI, sangre);
+            _patients.Add(createdp);
+            escribirPatient();
+            return createdp;
         }
         public Patient ActualizarPatient(int ci, Patient p_actualizado) {
             Patient patient = _patients.Find(x => x.CI == ci);
+
             if (patient == null)
             {
                 throw new NotImplementedException();
             }
-            throw new NotImplementedException();
+            patient.Name = p_actualizado.Name;
+            patient.LastName = p_actualizado.LastName;
+            patient.BloodType = p_actualizado.BloodType;
+            escribirPatient();
+            return patient;
         }
         public List<Patient> GetPatients()
         {
             return _patients;
         }
         public List<Patient> DeletePatients(int ci) {
-            _patients.Remove(_patients.Find(x => x.CI == ci));
+            Patient patient = _patients.Find(x => x.CI == ci);
+            if (patient == null)
+            {
+                throw new NotImplementedException();
+            }
+            _patients.Remove(patient);
+            escribirPatient();
             return _patients;
         }
         public Patient GetPatientByCI(int ci)
         {
-            return _patients.Find(x => x.CI == ci);
+            Patient patient = _patients.Find(x => x.CI == ci);
+            if (patient == null) { 
+                throw new NotImplementedException();
+            }
+            return patient;
         }
         private void leerPatient() { 
             StreamReader sr = new StreamReader("D:\\Git\\practicaDos\\Practica-2\\Patients.txt");
+            _patients.Clear();
             while (!sr.EndOfStream) { 
                 string line = sr.ReadLine();
                 string[] info_pacientes = line.Split(",");
