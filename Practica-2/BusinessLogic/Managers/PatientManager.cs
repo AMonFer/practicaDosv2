@@ -7,9 +7,13 @@ using System.Threading.Tasks;
 
 namespace UPB.BusinessLogic.Managers
 {
-    internal class PatientManager
+    public class PatientManager
     {
-        public PatientManager() { }
+        private List<Patient> _patients;
+        public PatientManager() { 
+            _patients = new List<Patient>();
+            leerPatient();
+        }
 
         public Patient CrearPatient(string name, string lastname, int CI) {
             string sangre = randomBlood();
@@ -21,7 +25,54 @@ namespace UPB.BusinessLogic.Managers
                 CI = CI,
                 BloodType = sangre
             };
+            _patients.Add(patient);
             return patient;
+        }
+        public Patient ActualizarPatient(int ci, Patient p_actualizado) {
+            Patient patient = _patients.Find(x => x.CI == ci);
+            if (patient == null)
+            {
+                throw new NotImplementedException();
+            }
+            throw new NotImplementedException();
+        }
+        public List<Patient> GetPatients()
+        {
+            return _patients;
+        }
+        public List<Patient> DeletePatients(int ci) {
+            _patients.Remove(_patients.Find(x => x.CI == ci));
+            return _patients;
+        }
+        public Patient GetPatientByCI(int ci)
+        {
+            return _patients.Find(x => x.CI == ci);
+        }
+        private void leerPatient() { 
+            StreamReader sr = new StreamReader("D:\\Git\\practicaDos\\Practica-2\\Patients.txt");
+            while (!sr.EndOfStream) { 
+                string line = sr.ReadLine();
+                string[] info_pacientes = line.Split(",");
+
+                Patient new_patient = new Patient()
+                {
+                    Name = info_pacientes[0],
+                    LastName = info_pacientes[1],
+                    CI = int.Parse(info_pacientes[2]),
+                    BloodType = info_pacientes[3]
+                };
+                _patients.Add(new_patient);
+            }
+            sr.Close();
+        }
+
+        private void escribirPatient() {
+            StreamWriter writer = new StreamWriter("D:\\Git\\practicaDos\\Practica-2\\Patients.txt");
+            foreach (var patient in _patients) {
+                string[] patientInfo = new[] { patient.Name, patient.LastName, $"{patient.CI}", patient.BloodType };
+                writer.WriteLine(string.Join(",", patientInfo));
+            }
+            writer.Close();
         }
         public string randomBlood() { 
             Random rnd = new Random();

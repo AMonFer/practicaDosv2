@@ -1,83 +1,43 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using BusinessLogic.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using UPB.BusinessLogic.Managers;
+
 
 namespace Practica_2.Controllers
 {
-    public class PatientController : Controller
+    [Route("api/[controller]")]
+    [ApiController]
+    public class PatientController : ControllerBase
     {
-        // GET: PatientController
-        public ActionResult Index()
-        {
-            return View();
+        private readonly PatientManager _patientManager;
+        public PatientController() {
+            _patientManager = new PatientManager();
+        }
+        [HttpGet]
+        public List<Patient> Get() {
+            return _patientManager.GetPatients();
         }
 
-        // GET: PatientController/Details/5
-        public ActionResult Details(int id)
-        {
-            return View();
+        [HttpGet]
+        [Route("{ci}")]
+        public Patient Get(int ci) { 
+            return _patientManager.GetPatientByCI(ci);
         }
-
-        // GET: PatientController/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: PatientController/Create
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+        public void Post([FromBody] Patient value) {
+            _patientManager.CrearPatient(value.Name, value.LastName, value.CI);
         }
-
-        // GET: PatientController/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
+        [HttpPut("{ci}")]
+        public void Put(int ci, [FromBody] Patient value) {
+            _patientManager.ActualizarPatient(ci, value);
         }
-
-        // POST: PatientController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        [HttpDelete("{ci}")]
+        public void Delete(int ci)
         {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+            _patientManager.DeletePatients(ci);
         }
-
-        // GET: PatientController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
-        // POST: PatientController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
+        
+        
     }
 }
