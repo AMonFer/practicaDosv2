@@ -1,4 +1,5 @@
 ﻿using BusinessLogic.Models;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,10 @@ namespace UPB.BusinessLogic.Managers
     public class PatientManager
     {
         private List<Patient> _patients;
-        public PatientManager() { 
+        private readonly IConfiguration _configuration;
+        public PatientManager(IConfiguration configuration) { 
+            _configuration = configuration;
+            
             _patients = new List<Patient>();
             leerPatient();
         }
@@ -58,8 +62,9 @@ namespace UPB.BusinessLogic.Managers
             }
             return patient;
         }
-        private void leerPatient() { 
-            StreamReader sr = new StreamReader("D:\\Git\\practicaDos\\Practica-2\\Patients.txt");
+        private void leerPatient() {
+            string connectionString = _configuration.GetSection("ConnectionStrings").GetSection("textconnection").Value;
+            StreamReader sr = new StreamReader(connectionString);
             _patients.Clear();
             while (!sr.EndOfStream) { 
                 string line = sr.ReadLine();
@@ -78,7 +83,8 @@ namespace UPB.BusinessLogic.Managers
         }
 
         private void escribirPatient() {
-            StreamWriter writer = new StreamWriter("D:\\Git\\practicaDos\\Practica-2\\Patients.txt");
+            string connectionString = _configuration.GetSection("ConnectionStrings").GetSection("textconnection").Value;
+            StreamWriter writer = new StreamWriter(connectionString);
             foreach (var patient in _patients) {
                 string[] patientInfo = new[] { patient.Name, patient.LastName, $"{patient.CI}", patient.BloodType };
                 writer.WriteLine(string.Join(",", patientInfo));

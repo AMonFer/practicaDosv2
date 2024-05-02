@@ -11,8 +11,8 @@ namespace Practica_2.Controllers
     public class PatientController : ControllerBase
     {
         private readonly PatientManager _patientManager;
-        public PatientController() {
-            _patientManager = new PatientManager();
+        public PatientController(PatientManager patientManager) {
+            _patientManager = patientManager;
         }
 
         [HttpGet]
