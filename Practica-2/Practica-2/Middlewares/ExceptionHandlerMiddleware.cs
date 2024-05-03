@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using System.Net;
 using System.Threading.Tasks;
+using UPB.BusinessLogic.Managers.Exceptions;
 
 namespace UPB.Practica_2.Middlewares
 {
@@ -14,10 +16,21 @@ namespace UPB.Practica_2.Middlewares
             _next = next;
         }
 
-        public Task Invoke(HttpContext httpContext)
+        public async Task Invoke(HttpContext httpContext)
         {
+            try {
+                await _next(httpContext);
+            }
+            catch (Exception ex) {
+                await ProcessError(httpContext, ex);
+            }
+            
+        }
 
-            return _next(httpContext);
+        private Task ProcessError(HttpContext httpContext, Exception ex) { 
+
+            string errorBodyJSON = $"{{\r\n Message = ${ex.InnerException.Message}, \r\n }}";
+            return httpContext.Response.WriteAsync(errorBodyJSON);
         }
     }
 

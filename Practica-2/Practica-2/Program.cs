@@ -1,6 +1,7 @@
 using Microsoft.OpenApi.Models;
 using Serilog;
 using UPB.BusinessLogic.Managers;
+using UPB.Practica_2.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,12 +18,15 @@ builder.Configuration
 // Add services to the container.
 
 builder.Services.AddControllers();
-builder.Services.AddSingleton<PatientManager>();
+builder.Services.AddTransient<PatientManager>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+//app.UseExceptionHandlerMiddleware();
+
 string direccionLog = builder.Configuration.GetSection("Logging").GetSection("FileLocation").Value;
 string titulo = builder.Configuration.GetSection("ConnectionStrings").GetSection("titulo").Value;
 
@@ -60,5 +64,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseExceptionHandlerMiddleware();
 
 app.Run();

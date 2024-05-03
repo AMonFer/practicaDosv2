@@ -1,6 +1,8 @@
-﻿namespace UPB.BusinessLogic.Managers
+﻿namespace UPB.BusinessLogic.Managers.Exceptions
 {
-    internal class PracticeException
+    public class PracticeException : Exception
     {
+        public PracticeException() { }
+        public PracticeException(string message) : base(message) { }
     }
 }
