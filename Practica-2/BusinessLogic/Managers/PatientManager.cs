@@ -1,5 +1,6 @@
 ﻿using BusinessLogic.Models;
 using Microsoft.Extensions.Configuration;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,6 +26,7 @@ namespace UPB.BusinessLogic.Managers
             createdp = new Patient(patient.Name, patient.LastName, patient.CI, sangre);
             _patients.Add(createdp);
             escribirPatient();
+            Log.Information($"Se creo un paciente con CI: {patient.CI}");
             return createdp;
         }
         public Patient ActualizarPatient(int ci, Patient p_actualizado) {
@@ -32,34 +34,42 @@ namespace UPB.BusinessLogic.Managers
 
             if (patient == null)
             {
-                throw new NotImplementedException();
+                Log.Error("Se busco un paciente que devolvio null en el metodo ActualizarPatient");
+                throw new InvalidOperationException("No se puede actualizar el paciente porque no se encontró ningún paciente con el CI proporcionado.");
             }
             patient.Name = p_actualizado.Name;
             patient.LastName = p_actualizado.LastName;
             patient.BloodType = p_actualizado.BloodType;
             escribirPatient();
+            Log.Information($"Se actualizo la informacion del paciente con CI: {ci}");
             return patient;
         }
         public List<Patient> GetPatients()
         {
+            Log.Information("Alguien solicito a a todos los pacientes");
             return _patients;
         }
         public List<Patient> DeletePatients(int ci) {
+            
             Patient patient = _patients.Find(x => x.CI == ci);
             if (patient == null)
             {
+                Log.Error("Se busco un paciente que devolvio null en el metodo DeletePatients");
                 throw new NotImplementedException();
             }
             _patients.Remove(patient);
             escribirPatient();
+            Log.Information($"Alguien borro al paciente con CI: {ci}");
             return _patients;
         }
         public Patient GetPatientByCI(int ci)
         {
             Patient patient = _patients.Find(x => x.CI == ci);
-            if (patient == null) { 
+            if (patient == null) {
+                Log.Error("Se busco un paciente que devolvio null en el metodo GetPatientByCI");
                 throw new NotImplementedException();
             }
+            Log.Information($"Alguien solicito al paciente con CI: {ci}");
             return patient;
         }
         private void leerPatient() {
