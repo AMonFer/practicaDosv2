@@ -37,8 +37,8 @@ namespace UPB.BusinessLogic.Managers
                 if (patient == null)
                 {
                     Log.Error("Se intentó actualizar un paciente que no existe en el método ActualizarPatient");
-                    return null;
-                    
+                    throw new PracticeException("El paciente fue null en ActualizarPatient");
+
                 }
                 patient.Name = p_actualizado.Name;
                 patient.LastName = p_actualizado.LastName;
@@ -69,7 +69,7 @@ namespace UPB.BusinessLogic.Managers
                 if (patient == null)
                 {
                     Log.Error("Se intentó borrar un paciente que no existe en el método DeletePatients");
-                    return null;
+                    throw new PracticeException("El paciente fue null en DeletePatients");
                 }
                 _patients.Remove(patient);
                 escribirPatient();
@@ -90,7 +90,7 @@ namespace UPB.BusinessLogic.Managers
                 if (patient == null)
                 {
                     Log.Error("Se busco un paciente que devolvio null en el metodo GetPatientByCI");
-                    return null;
+                    throw new PracticeException("El paciente fue null en GetPatientByCI");
                 }
                 Log.Information($"Alguien solicito al paciente con CI: {ci}");
                 return patient;
