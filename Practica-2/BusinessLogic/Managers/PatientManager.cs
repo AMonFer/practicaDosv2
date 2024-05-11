@@ -1,5 +1,6 @@
 ﻿using BusinessLogic.Models;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -21,10 +22,12 @@ namespace UPB.BusinessLogic.Managers
             leerPatient();
         }
 
-        public Patient CrearPatient(Patient patient) {
+        public async Task<Patient> CrearPatient(Patient patient) {
             string sangre = randomBlood();
             Patient createdp;
-            createdp = new Patient(patient.Name, patient.LastName, patient.CI, sangre);
+            string codigo = await CreateCode(patient);
+
+            createdp = new Patient(patient.Name, patient.LastName, patient.CI, sangre, codigo);
             _patients.Add(createdp);
             escribirPatient();
             Log.Information($"Se creo un paciente con CI: {patient.CI}");
@@ -123,7 +126,8 @@ namespace UPB.BusinessLogic.Managers
                     Name = info_pacientes[0],
                     LastName = info_pacientes[1],
                     CI = int.Parse(info_pacientes[2]),
-                    BloodType = info_pacientes[3]
+                    BloodType = info_pacientes[3],
+                    Codigo = info_pacientes[4]
                 };
                 _patients.Add(new_patient);
             }
@@ -139,7 +143,7 @@ namespace UPB.BusinessLogic.Managers
             }
             StreamWriter writer = new StreamWriter(connectionString);
             foreach (var patient in _patients) {
-                string[] patientInfo = new[] { patient.Name, patient.LastName, $"{patient.CI}", patient.BloodType };
+                string[] patientInfo = new[] { patient.Name, patient.LastName, $"{patient.CI}", patient.BloodType, patient.Codigo};
                 writer.WriteLine(string.Join(",", patientInfo));
             }
             writer.Close();
@@ -176,6 +180,35 @@ namespace UPB.BusinessLogic.Managers
             }
             return "O+";
 
+        }
+        private async Task<string> CreateCode(Patient patient)
+        {
+            var patientInfo = new { Name = patient.Name, LastName = patient.LastName, CI = patient.CI };
+            var patientInfoJson = JsonConvert.SerializeObject(patientInfo);
+            var contenido = new StringContent(patientInfoJson, System.Text.Encoding.UTF8, "application/json");
+
+            using (HttpClient httpClient = new HttpClient())
+            {
+                httpClient.BaseAddress = new Uri("http://localhost:5217/");
+
+                // Realizar una solicitud POST
+                HttpResponseMessage responseMessage = await httpClient.PostAsync("api/PatientCode", contenido);
+
+                // Manejar la respuesta de manera adecuada
+                if (responseMessage.IsSuccessStatusCode)
+                {
+                    // Leer y manejar el contenido de la respuesta
+                    string responseContent = await responseMessage.Content.ReadAsStringAsync();
+                    Console.WriteLine(responseContent);
+                    return responseContent;
+                }
+                else
+                {
+                    // Manejar el error de manera adecuada
+                    Console.WriteLine("Error al obtener el código del paciente.");
+                    return null;
+                }
+            }
         }
     }
 }
