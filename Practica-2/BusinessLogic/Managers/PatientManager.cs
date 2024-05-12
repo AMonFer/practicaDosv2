@@ -183,28 +183,35 @@ namespace UPB.BusinessLogic.Managers
         }
         private async Task<string> CreateCode(Patient patient)
         {
+            string dir_backserv = _configuration.GetSection("ConnectionStrings").GetSection("backingservice").Value;
+            if (string.IsNullOrEmpty(dir_backserv))
+            {
+                Log.Error("El valor de la direccion del backing service fue nulo o vacio en CreateCode");
+                return null;
+            }
+
             var patientInfo = new { Name = patient.Name, LastName = patient.LastName, CI = patient.CI };
             var patientInfoJson = JsonConvert.SerializeObject(patientInfo);
             var contenido = new StringContent(patientInfoJson, System.Text.Encoding.UTF8, "application/json");
 
             using (HttpClient httpClient = new HttpClient())
             {
-                httpClient.BaseAddress = new Uri("http://localhost:5217/");
+                httpClient.BaseAddress = new Uri(dir_backserv);
 
-                // Realizar una solicitud POST
+                
                 HttpResponseMessage responseMessage = await httpClient.PostAsync("api/PatientCode", contenido);
 
-                // Manejar la respuesta de manera adecuada
+                
                 if (responseMessage.IsSuccessStatusCode)
                 {
-                    // Leer y manejar el contenido de la respuesta
+                    
                     string responseContent = await responseMessage.Content.ReadAsStringAsync();
                     Console.WriteLine(responseContent);
                     return responseContent;
                 }
                 else
                 {
-                    // Manejar el error de manera adecuada
+                    
                     Console.WriteLine("Error al obtener el código del paciente.");
                     return null;
                 }
